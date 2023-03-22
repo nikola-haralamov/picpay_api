@@ -17,10 +17,17 @@ module PicPayApi
             uri:           URI::Generic,
             payload:       T.nilable(T::Hash[Symbol, T.untyped]),
             authorization: T.nilable(PicPayApi::Entities::Authorization),
+            logger: T.untyped
           ).returns(T::Hash[Symbol, T.untyped])
         end
-        def get(uri:, payload: nil, authorization: nil)
-          request!(uri: uri, request: Net::HTTP::Get.new(uri), payload: payload, authorization: authorization)
+        def get(uri:, payload: nil, authorization: nil, logger: nil)
+          request!(
+            uri: uri,
+            request: Net::HTTP::Get.new(uri),
+            payload: payload,
+            authorization: authorization,
+            logger: logger
+          )
         end
 
         sig do
@@ -28,10 +35,17 @@ module PicPayApi
             uri:           URI::Generic,
             payload:       T.nilable(T::Hash[Symbol, T.untyped]),
             authorization: T.nilable(PicPayApi::Entities::Authorization),
+            logger: T.untyped
           ).returns(T::Hash[Symbol, T.untyped])
         end
-        def post(uri:, payload: nil, authorization: nil)
-          request!(uri: uri, request: Net::HTTP::Post.new(uri), payload: payload, authorization: authorization)
+        def post(uri:, payload: nil, authorization: nil, logger: nil)
+          request!(
+            uri: uri,
+            request: Net::HTTP::Post.new(uri),
+            payload: payload,
+            authorization: authorization,
+            logger: logger
+          )
         end
 
         sig do
@@ -39,10 +53,17 @@ module PicPayApi
             uri:           URI::Generic,
             payload:       T::Hash[Symbol, T.untyped],
             authorization: T.nilable(PicPayApi::Entities::Authorization),
+            logger: T.untyped
           ).returns(T::Hash[Symbol, T.untyped])
         end
-        def put(uri:, payload:, authorization: nil)
-          request!(uri: uri, request: Net::HTTP::Put.new(uri), payload: payload, authorization: authorization)
+        def put(uri:, payload:, authorization: nil, logger: nil)
+          request!(
+            uri: uri,
+            request: Net::HTTP::Put.new(uri),
+            payload: payload,
+            authorization: authorization,
+            logger: logger
+          )
         end
 
         private
@@ -53,20 +74,25 @@ module PicPayApi
             request:       Net::HTTPGenericRequest,
             payload:       T.nilable(T::Hash[Symbol, T.untyped]),
             authorization: T.nilable(PicPayApi::Entities::Authorization),
+            logger: T.untyped
           ).returns(T::Hash[Symbol, T.untyped])
         end
-        def request!(uri:, request:, payload: nil, authorization: nil)
+        def request!(uri:, request:, payload: nil, authorization: nil, logger: nil)
+          http = Net::HTTP.new(uri.hostname, uri.port)
+          http.use_ssl = true
+          http.set_debug_output(logger) if logger
+
           request.body             = payload.to_json unless payload.nil?
           request['accept']        = 'application/json'
           request['content-type']  = 'application/json'
           request['authorization'] = authorization.to_s unless authorization.nil?
 
-          response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(request) }
+          response = http.request(request)
+
           response.value
 
           T.let(JSON.parse(response.body, symbolize_names: true), T::Hash[Symbol, T.untyped])
         end
-
       end
     end
   end
