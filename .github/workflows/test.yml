@@ -9,7 +9,7 @@ on:
 
 jobs:
   test:
-    uses: latamgateway/ruby-linters-latam/.github/workflows/rspec.yml@0.1.0
+    uses: latamgateway/ruby-linters-latam/.github/workflows/rspec.yml@main
 
   type-check:
     runs-on: ubuntu-latest

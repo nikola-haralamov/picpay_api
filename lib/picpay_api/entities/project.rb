@@ -96,15 +96,22 @@ module PicPayApi
 
       sig { params(hash: T::Hash[Symbol, T.untyped]).returns(PicPayApi::Entities::Project) }
       def self.from_h(hash)
+        started_at = DateTime.parse(hash[:started_at].to_s) unless hash[:started_at].blank?
+        ended_at = DateTime.parse(hash[:ended_at].to_s) unless hash[:ended_at].blank?
+        payee_transaction_limit = Integer(hash[:payee_transaction_limit]) unless hash[:payee_transaction_limit].blank?
+        payee_transaction_value = Float(hash[:payee_transaction_value]) unless hash[:payee_transaction_value].blank?
+        withdrawable = hash.fetch(:withdrawable, nil) ? true : hash[:withdrawable].to_s.downcase == 'true'
+        identical_transaction_rule = hash.fetch(:identical_transaction_rule, nil) ? true : hash[:identical_transaction_rule].to_s.downcase == 'true'
+
         PicPayApi::Entities::Project.new(
           name:                       hash.fetch(:name, nil)&.to_s,
           description:                hash.fetch(:description, nil)&.to_s,
-          started_at:                 DateTime.parse(hash[:started_at].to_s),
-          ended_at:                   DateTime.parse(hash[:ended_at].to_s),
-          withdrawable:               (hash[:withdrawable].to_s.downcase == 'true'),
-          payee_transaction_limit:    hash[:payee_transaction_limit].to_i,
-          payee_transaction_value:    hash[:payee_transaction_value].to_f,
-          identical_transaction_rule: (hash[:identical_transaction_rule].to_s.downcase == 'true'),
+          started_at:                 started_at,
+          ended_at:                   ended_at,
+          withdrawable:               withdrawable,
+          payee_transaction_limit:    payee_transaction_limit,
+          payee_transaction_value:    payee_transaction_value,
+          identical_transaction_rule: identical_transaction_rule,
           created_at:                 hash.fetch(:created_at, nil),
           updated_at:                 hash.fetch(:updated_at, nil),
           payer_email:                hash.fetch(:payer_email, nil),

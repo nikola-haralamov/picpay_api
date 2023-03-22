@@ -25,7 +25,7 @@ module PicPayApi
         base_url:      String,
         authorization: PicPayApi::Entities::Authorization,
         reference_id:  String,
-        logger:        Logger
+        logger: T.untyped
       ).void
     end
     # @param [String] base_url Picpay API base URL.
@@ -35,7 +35,7 @@ module PicPayApi
       base_url:,
       authorization:,
       reference_id:,
-      logger: Logger.new(STDOUT)
+      logger: Logger.new($stdout)
     )
       @logger        = logger
       @url           = T.let(URI.join(base_url, '/v1/b2p/transfer'), URI::Generic)
@@ -53,7 +53,12 @@ module PicPayApi
     #
     # @param [PicPayApi::Entities::Remittance] entity Remittance Entity with loaded data
     def transfer(entity:)
-      body = PicPayApi::HTTP::Client.post(uri: @url, payload: entity.to_h, authorization: @authorization)
+      body = PicPayApi::HTTP::Client.post(
+        uri: @url,
+        payload: entity.to_h,
+        authorization: @authorization,
+        logger: @logger
+      )
       PicPayApi::Entities::RemittanceResponse.from_h(body)
     end
 
