@@ -80,9 +80,8 @@ module PicPayApi
 
       sig { returns(T::Hash[Symbol, T.untyped]) }
       def to_h
-        @project_id.nil? ? hash = {} : hash = { project_id: @project_id }
-
-        hash.merge!({
+        {
+          project_id:                 @project_id,
           name:                       @name,
           description:                @description,
           started_at:                 @started_at,
@@ -91,7 +90,7 @@ module PicPayApi
           payee_transaction_limit:    @payee_transaction_limit,
           payee_transaction_value:    @payee_transaction_value,
           identical_transaction_rule: @identical_transaction_rule,
-        })
+        }.compact
       end
 
       sig { params(hash: T::Hash[Symbol, T.untyped]).returns(PicPayApi::Entities::Project) }
@@ -100,12 +99,12 @@ module PicPayApi
         ended_at = DateTime.parse(hash[:ended_at].to_s) unless hash[:ended_at].blank?
         payee_transaction_limit = Integer(hash[:payee_transaction_limit]) unless hash[:payee_transaction_limit].blank?
         payee_transaction_value = Float(hash[:payee_transaction_value]) unless hash[:payee_transaction_value].blank?
-        withdrawable = hash.fetch(:withdrawable, nil) ? true : hash[:withdrawable].to_s.downcase == 'true'
-        identical_transaction_rule = hash.fetch(:identical_transaction_rule, nil) ? true : hash[:identical_transaction_rule].to_s.downcase == 'true'
+        withdrawable = hash[:withdrawable].to_s.downcase == 'true' unless hash[:withdrawable].blank?
+        identical_transaction_rule = hash[:identical_transaction_rule].to_s.downcase == 'true' unless hash[:identical_transaction_rule].blank?
 
         PicPayApi::Entities::Project.new(
-          name:                       hash.fetch(:name, nil)&.to_s,
-          description:                hash.fetch(:description, nil)&.to_s,
+          name:                       hash.fetch(:name, nil),
+          description:                hash.fetch(:description, nil),
           started_at:                 started_at,
           ended_at:                   ended_at,
           withdrawable:               withdrawable,
