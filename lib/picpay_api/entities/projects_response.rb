@@ -47,7 +47,7 @@ module PicPayApi
           current_page: hash[:current_page].to_i,
           last_page:    hash[:last_page].to_i,
           per_page:     hash[:per_page].to_i,
-          data:         hash[:data].map!{ |project| PicPayApi::Entities::Project.from_hash(project) },
+          data:         hash[:data].map!{ |project| PicPayApi::Entities::Project.from_h(project) },
         )
       end
 

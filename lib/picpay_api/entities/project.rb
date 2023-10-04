@@ -90,7 +90,13 @@ module PicPayApi
           payee_transaction_limit:    @payee_transaction_limit,
           payee_transaction_value:    @payee_transaction_value,
           identical_transaction_rule: @identical_transaction_rule,
-        }.compact
+        }.filter do |k, v|
+          if [:withdrawable, :identical_transaction_rule].include?(k)
+            !v.nil?
+          else
+            true
+          end
+        end
       end
 
       sig { params(hash: T::Hash[Symbol, T.untyped]).returns(PicPayApi::Entities::Project) }
@@ -99,8 +105,8 @@ module PicPayApi
         ended_at = DateTime.parse(hash[:ended_at].to_s) unless hash[:ended_at].blank?
         payee_transaction_limit = Integer(hash[:payee_transaction_limit]) unless hash[:payee_transaction_limit].blank?
         payee_transaction_value = Float(hash[:payee_transaction_value]) unless hash[:payee_transaction_value].blank?
-        withdrawable = hash[:withdrawable].to_s.downcase == 'true' unless hash[:withdrawable].blank?
-        identical_transaction_rule = hash[:identical_transaction_rule].to_s.downcase == 'true' unless hash[:identical_transaction_rule].blank?
+        withdrawable = hash[:withdrawable].to_s.downcase == 'true' unless hash[:withdrawable].nil?
+        identical_transaction_rule = hash[:identical_transaction_rule].to_s.downcase == 'true' unless hash[:identical_transaction_rule].nil?
 
         PicPayApi::Entities::Project.new(
           name:                       hash.fetch(:name, nil),

@@ -12,7 +12,7 @@ RSpec.describe PicPayApi::Project do
   let(:project) do
     described_class.new(
       base_url:      base_url,
-      authorization: authorization,
+      access_token_generator: lambda { authorization },
       )
   end
 
@@ -158,6 +158,10 @@ RSpec.describe PicPayApi::Project do
   end
 
   describe 'manual update' do
+    before do
+      entity.project_id = project_id
+    end
+
     it 'performs manual update success' do
       stub_request(:put, url)
         .with(body: { project_id: project_id }.merge!(payload).to_json)

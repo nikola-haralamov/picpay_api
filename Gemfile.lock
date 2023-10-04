@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    picpay_api (0.1.3)
+    picpay_api (0.2.0)
       sorbet-runtime (~> 0.5.10649)
 
 GEM

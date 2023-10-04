@@ -12,7 +12,7 @@ RSpec.describe PicPayApi::Transfer do
   let(:transfer) do
     described_class.new(
       base_url:      base_url,
-      authorization: authorization,
+      access_token_generator: lambda { authorization },
       reference_id:  reference_id,
     )
   end
